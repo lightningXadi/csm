@@ -90,7 +90,7 @@
       <div class="modal-meta" id="modal-meta"></div>
       <div class="modal-preview" id="modal-preview"></div>
       <div class="modal-footer">
-        <button class="btn btn-ghost btn-sm" id="modal-close-btn">Close</button>
+        <button class="btn btn-ghost-dark btn-sm" id="modal-close-btn">Close</button>
         <a class="btn btn-primary btn-sm" id="modal-download" href="#" target="_blank" rel="noopener">Download</a>
       </div>
     </div>
@@ -168,7 +168,7 @@
                 </div>
                 <div class="file-actions">
                   <span class="ext-chip">${m.extension || extOf(m.originalName)}</span>
-                  ${m.extension === 'pdf' ? `<button class="btn btn-sm btn-ghost" onclick="openPreview('${m._id}')">Preview</button>` : ''}
+                  ${m.extension === 'pdf' ? `<button class="btn btn-sm btn-ghost-dark" onclick="openPreview('${m._id}')">Preview</button>` : ''}
                   <a class="btn btn-sm btn-primary" href="${m.fileUrl}" target="_blank" rel="noopener" download>Download</a>
                 </div>
               </div>`).join('') : '<div class="file-empty">Nothing filed yet</div>'}

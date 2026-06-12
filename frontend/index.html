@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSM — Study Material, Catalogued</title>
+  <link rel="stylesheet" href="public/css/main.css" />
+  <style>
+    /* ── Hero ─────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: calc(88vh - var(--nav-h));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(244,236,217,.08);
+    }
+    .hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(180deg, rgba(244,236,217,.025) 0 1px, transparent 1px 38px);
+      pointer-events: none;
+    }
+    .hero-inner { position: relative; padding: 60px 0 80px; }
+    .hero h1 {
+      font-family: var(--stamp);
+      font-size: clamp(3.2rem, 12vw, 8rem);
+      line-height: .95;
+      letter-spacing: .03em;
+      margin: 16px 0 8px;
+    }
+    .hero .sub {
+      font-style: italic;
+      font-size: clamp(1.1rem, 2.8vw, 1.65rem);
+      color: var(--cream-soft);
+      margin-bottom: 20px;
+      max-width: 34ch;
+    }
+    .hero .tagline { max-width: 48ch; color: var(--cream-soft); font-size: 1.02rem; margin-bottom: 34px; }
+    .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .stamp-hero {
+      position: absolute;
+      top: 72px; right: 5%;
+      border: 3px solid var(--red);
+      color: var(--red);
+      font-family: var(--stamp);
+      font-size: clamp(1rem, 2.2vw, 1.5rem);
+      letter-spacing: .22em;
+      padding: 10px 22px;
+      transform: rotate(-9deg) scale(.6);
+      opacity: 0;
+      border-radius: 4px;
+      text-transform: uppercase;
+      mix-blend-mode: screen;
+      animation: stampIn .5s .7s cubic-bezier(.34,1.56,.64,1) forwards;
+    }
+    .stamp-hero::after {
+      content: ""; position: absolute; inset: -8px;
+      border: 1px solid var(--red); border-radius: 4px;
+    }
+    @keyframes stampIn { to { opacity: .85; transform: rotate(-9deg) scale(1); } }
+
+    .tab-strip { display: flex; gap: 6px; margin-top: 56px; flex-wrap: wrap; }
+    .tab-strip span {
+      font-family: var(--mono); font-size: .7rem; letter-spacing: .12em;
+      text-transform: uppercase; padding: 8px 15px 7px;
+      border-radius: 4px 4px 0 0; color: var(--ink); opacity: .92;
+    }
+    .tab-strip span:nth-child(1){ background: var(--java); }
+    .tab-strip span:nth-child(2){ background: var(--ngdb); }
+    .tab-strip span:nth-child(3){ background: var(--testing); }
+    .tab-strip span:nth-child(4){ background: var(--cyber); }
+    .tab-strip span:nth-child(5){ background: var(--erp); }
+
+    /* ── Problem section ──────────────────────── */
+    .problem { background: var(--bg-deep); padding: 100px 0; }
+    .compare { display: grid; grid-template-columns: 1.1fr auto 1fr; align-items: center; gap: 40px; }
+    .scrap-pile { position: relative; height: 300px; }
+    .scrap {
+      position: absolute; width: 78%;
+      padding: 16px 18px;
+      background: var(--manila); color: var(--ink);
+      font-family: var(--stamp); font-size: .9rem; line-height: 1.4;
+      box-shadow: 0 14px 30px rgba(0,0,0,.35);
+      clip-path: polygon(2% 4%, 98% 0%, 100% 96%, 1% 100%);
+    }
+    .scrap .meta { display: block; margin-top: 8px; font-family: var(--mono); font-size: .65rem; letter-spacing: .08em; color: var(--ink-soft); text-transform: uppercase; }
+    .scrap.s1{ top:0;    left:0;   transform: rotate(-7deg); z-index:1; }
+    .scrap.s2{ top:65px; left:25%; transform: rotate(4deg);  background:#e6d6b8; z-index:2; }
+    .scrap.s3{ top:140px;left:3%;  transform: rotate(-3deg); background:#dfcca7; z-index:3; }
+    .scrap.s4{ top:215px;left:20%; transform: rotate(6deg);  background:#e9dcc0; z-index:4; }
+    .vs-arrow { font-family: var(--mono); font-size: 2rem; color: var(--cream-soft); }
+    .index-card {
+      background: var(--manila); color: var(--ink);
+      border-radius: 4px; padding: 26px 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.4); position: relative;
+    }
+    .index-card::before { content: ""; position: absolute; left:0; right:0; top:38px; height:1px; background: var(--manila-line); }
+    .index-card .ic-tag {
+      display: inline-block; font-family: var(--mono); font-size: .66rem;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 3px;
+      background: var(--java); color: var(--ink); margin-bottom: 12px;
+    }
+    .index-card h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+    .index-card p  { color: var(--ink-soft); font-size: .9rem; margin-bottom: 16px; }
+    .index-card .ic-row { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: .74rem; color: var(--ink-soft); padding-top: 14px; }
+
+    /* ── Recent uploads ───────────────────────── */
+    .recent { padding: 100px 0; }
+    .recent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+    .recent-card {
+      background: var(--manila); color: var(--ink);
+      border-radius: 4px; padding: 18px 20px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      display: flex; flex-direction: column; gap: 10px;
+      transition: transform .2s;
+    }
+    .recent-card:hover { transform: translateY(-3px); }
+    .recent-card .rc-cat {
+      font-family: var(--mono); font-size: .64rem; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--ink-soft);
+    }
+    .recent-card .rc-title { font-size: .96rem; font-weight: 600; line-height: 1.3; }
+    .recent-card .rc-meta  { font-family: var(--mono); font-size: .66rem; color: var(--ink-soft); }
+    .recent-card .rc-footer{ display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+
+    /* ── Subject grid ─────────────────────────── */
+    .subjects-sect { background: var(--bg-deep); padding: 100px 0; }
+    .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .subject-card {
+      border-radius: 5px; padding: 24px 22px;
+      cursor: pointer; text-decoration: none;
+      display: flex; flex-direction: column; gap: 10px;
+      transition: transform .2s, box-shadow .2s;
+      position: relative; overflow: hidden;
+    }
+    .subject-card::before { content: ""; position: absolute; top:0; left:0; right:0; height:3px; }
+    .subject-card:hover { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(0,0,0,.35); }
+    .subject-card.java    { background: rgba(201,154,59,.1);  } .subject-card.java::before    { background: var(--java); }
+    .subject-card.ngdb    { background: rgba(92,122,138,.1);  } .subject-card.ngdb::before    { background: var(--ngdb); }
+    .subject-card.testing { background: rgba(94,122,94,.1);   } .subject-card.testing::before { background: var(--testing); }
+    .subject-card.cyber   { background: rgba(166,90,60,.1);   } .subject-card.cyber::before   { background: var(--cyber); }
+    .subject-card.erp     { background: rgba(138,91,110,.1);  } .subject-card.erp::before     { background: var(--erp); }
+    .sc-tag {
+      font-family: var(--mono); font-size: .66rem; letter-spacing: .14em;
+      text-transform: uppercase; display: inline-block;
+      padding: 5px 11px; border-radius: 3px; color: var(--ink); font-weight: 600;
+    }
+    .java    .sc-tag { background: var(--java); }
+    .ngdb    .sc-tag { background: var(--ngdb); }
+    .testing .sc-tag { background: var(--testing); }
+    .cyber   .sc-tag { background: var(--cyber); }
+    .erp     .sc-tag { background: var(--erp); }
+    .sc-name { font-size: 1rem; font-weight: 600; color: var(--cream); }
+    .sc-sem  { font-family: var(--mono); font-size: .66rem; color: var(--cream-soft); }
+
+    /* ── Roles ────────────────────────────────── */
+    .roles { padding: 100px 0; }
+    .role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
+    @media (max-width: 700px) { .role-grid { grid-template-columns: 1fr; } .compare { grid-template-columns: 1fr; } .vs-arrow { transform: rotate(90deg); text-align: center; } .scrap-pile { height: 240px; } }
+    .perm-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .perm-list li { display: flex; gap: 10px; font-size: .92rem; }
+    .perm-list li .mark { font-family: var(--mono); flex: 0 0 20px; }
+    .perm-list li.yes .mark { color: var(--testing); }
+    .perm-list li.no  { color: var(--ink-soft); } .perm-list li.no .mark { color: var(--red); }
+  </style>
+</head>
+<body>
+
+  <header id="topnav" class="topnav"></header>
+
+  <!-- ─── HERO ─────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="stamp-hero">Open</div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow">Semester 5 · Computer Science</p>
+      <h1>CSM</h1>
+      <p class="sub">Study Material, Catalogued.</p>
+      <p class="tagline">One clean place for notes, PPTs, and assignments. No WhatsApp hunting. No missed links. Just open and study.</p>
+      <div class="cta-row">
+        <a href="browse.html" class="btn btn-primary">Browse Materials</a>
+        <a href="faculty.html" class="btn btn-ghost">Faculty Login</a>
+      </div>
+      <div class="tab-strip">
+        <span>Java</span>
+        <span>Databases</span>
+        <span>Testing</span>
+        <span>Cyber Security</span>
+        <span>ERP</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PROBLEM ─────────────────────────────────────────────────── -->
+  <section class="problem">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">The Problem</p>
+        <h2>Stop digging through messages.</h2>
+        <p>Materials scattered across WhatsApp, Telegram, email, and personal chats — now filed in one place.</p>
+      </div>
+      <div class="compare reveal">
+        <div class="scrap-pile">
+          <div class="scrap s1">Unit 3 notes forwarded by Priya 📎<span class="meta">WhatsApp · 2 days ago</span></div>
+          <div class="scrap s2">RE: Assignment 2 — see attachment<span class="meta">Email · last week</span></div>
+          <div class="scrap s3">Unit 1 PPT — did anyone save it?<span class="meta">Telegram group · 4 days ago</span></div>
+          <div class="scrap s4">Testing syllabus PDF?? anyone??<span class="meta">Instagram DM · yesterday</span></div>
+        </div>
+        <div class="vs-arrow">→</div>
+        <div class="index-card">
+          <span class="ic-tag">Java · Notes</span>
+          <h3>Unit 3 — Collections Framework</h3>
+          <p>ArrayList, LinkedList, HashMap — complete lecture notes with examples.</p>
+          <div class="ic-row">
+            <span>Prof. A. Sharma · 14 Jun</span>
+            <a href="browse.html" class="btn btn-sm btn-primary">Download</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── RECENT UPLOADS ──────────────────────────────────────────── -->
+  <section class="recent">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Just Filed</p>
+        <h2>Recent Uploads</h2>
+        <p>Latest materials added by faculty — check back often.</p>
+      </div>
+      <div class="recent-grid reveal" id="recent-grid">
+        <!-- Populated by JS -->
+        <div class="no-results">Loading…</div>
+      </div>
+      <div style="margin-top: 32px; text-align: center;">
+        <a href="browse.html" class="btn btn-ghost">View All Materials →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── SUBJECTS ────────────────────────────────────────────────── -->
+  <section class="subjects-sect">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Semester 5</p>
+        <h2>Browse by Subject</h2>
+        <p>Five subjects, three categories each. Click any subject to see its materials.</p>
+      </div>
+      <div class="subject-grid reveal" id="subject-grid"></div>
+    </div>
+  </section>
+
+  <!-- ─── ROLES ────────────────────────────────────────────────────── -->
+  <section class="roles">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="eyebrow">Who it's for</p>
+        <h2>Two roles. One purpose.</h2>
+      </div>
+      <div class="role-grid reveal">
+        <div class="nb-card">
+          <p class="eyebrow" style="margin-bottom:10px;">Students</p>
+          <h3 style="font-size:1.4rem;font-weight:700;margin-bottom:18px;color:var(--ink);">Browse &amp; Download</h3>
+          <ul class="perm-list">
+            <li class="yes"><span class="mark">✓</span> No login required</li>
+            <li class="yes"><span class="mark">✓</span> Search across all materials</li>
+            <li class="yes"><span class="mark">✓</span> Browse by subject &amp; category</li>
+            <li class="yes"><span class="mark">✓</span> Preview PDFs in-browser</li>
+            <li class="yes"><span class="mark">✓</span> One-click download</li>
+            <li class="no"><span class="mark">✗</span> Upload materials</li>
+          </ul>
+        </div>
+        <div class="nb-card">
+          <p class="eyebrow" style="margin-bottom:10px;">Faculty</p>
+          <h3 style="font-size:1.4rem;font-weight:700;margin-bottom:18px;color:var(--ink);">Upload &amp; Manage</h3>
+          <ul class="perm-list">
+            <li class="yes"><span class="mark">✓</span> Secure login</li>
+            <li class="yes"><span class="mark">✓</span> Upload Notes, PPTs, Assignments</li>
+            <li class="yes"><span class="mark">✓</span> Edit file titles &amp; categories</li>
+            <li class="yes"><span class="mark">✓</span> Delete own materials</li>
+            <li class="yes"><span class="mark">✓</span> Changes are instantly visible</li>
+            <li class="no"><span class="mark">✗</span> Edit other faculty's files</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ────────────────────────────────────────────────────── -->
+  <footer style="padding:52px 0 60px; text-align:center; border-top:1px solid rgba(244,236,217,.07);">
+    <div class="wrap">
+      <p class="eyebrow" style="margin-bottom:8px;">Computer Science · Semester 5</p>
+      <h4 style="font-family:var(--stamp);font-size:1.6rem;margin-bottom:6px;">CSM</h4>
+      <p style="color:var(--cream-soft);font-size:.88rem;">Built to replace the WhatsApp search bar.</p>
+    </div>
+  </footer>
+
+  <script src="public/js/shared.js"></script>
+  <script>
+    // ── Init nav
+    buildNav('home');
+    initReveal();
+
+    // ── Recent uploads
+    async function loadRecent() {
+      const grid = document.getElementById('recent-grid');
+      try {
+        const { data } = await API.getRecent(5);
+        if (!data.length) {
+          grid.innerHTML = '<p class="no-results">No materials filed yet — check back soon.</p>';
+          return;
+        }
+        grid.innerHTML = data.map(m => {
+          const subj = subjectById(m.subject);
+          return `
+          <div class="recent-card">
+            <span class="rc-cat">${subj.name} · ${m.category}</span>
+            <div class="rc-title">${m.title}</div>
+            <div class="rc-meta">${m.facultyName} · ${formatDate(m.uploadedAt)}</div>
+            <div class="rc-footer">
+              <span class="ext-chip">${m.extension || '—'}</span>
+              <a href="${m.fileUrl}" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Download</a>
+            </div>
+          </div>`;
+        }).join('');
+      } catch {
+        grid.innerHTML = '<p class="no-results">Could not load recent materials.</p>';
+      }
+    }
+
+    // ── Subject grid
+    function buildSubjectGrid() {
+      const grid = document.getElementById('subject-grid');
+      grid.innerHTML = SUBJECTS.map(s => `
+        <a href="browse.html?subject=${s.id}" class="subject-card ${s.id}">
+          <span class="sc-tag">${s.tag}</span>
+          <span class="sc-name">${s.name}</span>
+          <span class="sc-sem">Semester ${s.semester}</span>
+        </a>`).join('');
+    }
+
+    loadRecent();
+    buildSubjectGrid();
+  </script>
+</body>
+</html>

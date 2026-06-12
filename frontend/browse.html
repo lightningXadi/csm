@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browse Materials — CSM</title>
+  <link rel="stylesheet" href="public/css/main.css" />
+  <style>
+    .browse-head { padding: 48px 0 36px; border-bottom: 1px solid rgba(244,236,217,.08); margin-bottom: 40px; }
+    .browse-head h1 { font-family: var(--stamp); font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 8px; }
+    .browse-head p  { color: var(--cream-soft); max-width: 50ch; }
+
+    /* Preview modal */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 800;
+      background: rgba(13,19,18,.82); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--manila); color: var(--ink);
+      border-radius: 6px; width: min(92vw, 840px); max-height: 90vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 30px 70px rgba(0,0,0,.5);
+      animation: fadeUp .35s ease both;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px; border-bottom: 1px solid var(--manila-line); flex-shrink: 0;
+    }
+    .modal-header h3 { font-size: 1rem; font-weight: 600; max-width: 60ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .modal-close { background: none; border: none; cursor: pointer; font-size: 1.4rem; color: var(--ink-soft); line-height: 1; padding: 0 4px; }
+    .modal-meta  { display: flex; gap: 14px; flex-wrap: wrap; padding: 12px 24px; border-bottom: 1px solid var(--manila-line); flex-shrink: 0; }
+    .modal-meta span { font-family: var(--mono); font-size: .7rem; color: var(--ink-soft); }
+    .modal-meta strong { color: var(--ink); }
+    .modal-preview { flex: 1; overflow: hidden; min-height: 0; }
+    .modal-preview iframe { width: 100%; height: 100%; min-height: 420px; border: none; }
+    .modal-preview .no-preview { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; height: 260px; }
+    .modal-preview .no-preview p { font-family: var(--mono); font-size: .8rem; color: var(--ink-soft); text-align: center; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--manila-line); display: flex; gap: 12px; justify-content: flex-end; flex-shrink: 0; }
+
+    /* File row in drawer — extended */
+    .file-row .file-left { flex: 1; min-width: 0; }
+  </style>
+</head>
+<body>
+
+  <header id="topnav" class="topnav"></header>
+
+  <main class="page">
+    <div class="wrap">
+
+      <div class="browse-head">
+        <p class="eyebrow">Semester 5 · All Subjects</p>
+        <h1>Materials Library</h1>
+        <p>Browse, search, preview, and download study materials filed by your faculty.</p>
+      </div>
+
+      <!-- Search & filter -->
+      <div class="search-row">
+        <input type="search" id="search-input" placeholder="Search by title, subject, category…" autocomplete="off" />
+        <select id="filter-subject">
+          <option value="">All Subjects</option>
+        </select>
+        <select id="filter-category">
+          <option value="">All Categories</option>
+          <option>Notes</option>
+          <option>PPTs</option>
+          <option>Assignments</option>
+        </select>
+      </div>
+
+      <!-- Cabinet -->
+      <div id="cabinet" class="cabinet"></div>
+      <div id="no-results" class="no-results" style="display:none;">No materials match your search.</div>
+      <div id="loading" style="display:flex;justify-content:center;padding:40px 0;">
+        <div class="spinner" style="border-color:rgba(244,236,217,.2);border-top-color:var(--cream);"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Preview Modal -->
+  <div class="modal-backdrop" id="preview-modal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-title">File Preview</h3>
+        <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-meta" id="modal-meta"></div>
+      <div class="modal-preview" id="modal-preview"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost btn-sm" id="modal-close-btn">Close</button>
+        <a class="btn btn-primary btn-sm" id="modal-download" href="#" target="_blank" rel="noopener">Download</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="public/js/shared.js"></script>
+  <script>
+    buildNav('browse');
+
+    // ── Populate selects
+    SUBJECTS.forEach(s => {
+      document.getElementById('filter-subject').insertAdjacentHTML('beforeend',
+        `<option value="${s.id}">${s.name}</option>`);
+    });
+
+    // Pre-fill from URL query
+    const urlParams = new URLSearchParams(location.search);
+    if (urlParams.get('subject')) document.getElementById('filter-subject').value = urlParams.get('subject');
+    if (urlParams.get('category')) document.getElementById('filter-category').value = urlParams.get('category');
+
+    // ── Data
+    let allMaterials = [];
+
+    async function loadMaterials() {
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('cabinet').innerHTML = '';
+      document.getElementById('no-results').style.display = 'none';
+      try {
+        const { data } = await API.getMaterials({ semester: 5, limit: 200 });
+        allMaterials = data;
+      } catch {
+        showToast('Could not load materials — is the server running?');
+      }
+      document.getElementById('loading').style.display = 'none';
+      renderCabinet();
+    }
+
+    function renderCabinet() {
+      const search   = document.getElementById('search-input').value.trim().toLowerCase();
+      const filterS  = document.getElementById('filter-subject').value;
+      const filterC  = document.getElementById('filter-category').value;
+      const cabinet  = document.getElementById('cabinet');
+
+      let html = '';
+      let anyDrawer = false;
+
+      SUBJECTS.forEach((subj, idx) => {
+        if (filterS && filterS !== subj.id) return;
+
+        let files = allMaterials.filter(f => f.subject === subj.id);
+        if (filterC) files = files.filter(f => f.category === filterC);
+        if (search)  files = files.filter(f =>
+          f.title.toLowerCase().includes(search) ||
+          subj.name.toLowerCase().includes(search) ||
+          f.category.toLowerCase().includes(search) ||
+          (f.facultyName || '').toLowerCase().includes(search)
+        );
+
+        if (search && !files.length) return;
+
+        anyDrawer = true;
+        const open = search || filterS || idx === 0;
+
+        const byCategory = { Notes: [], PPTs: [], Assignments: [] };
+        files.forEach(f => { if (byCategory[f.category]) byCategory[f.category].push(f); });
+
+        const foldersHtml = Object.entries(byCategory).map(([cat, items]) => `
+          <div class="folder">
+            <h4>${cat}</h4>
+            ${items.length ? items.map(m => `
+              <div class="file-row">
+                <div class="file-left">
+                  <div class="file-name">${m.title}</div>
+                  <div class="file-meta">${m.facultyName} · ${formatDate(m.uploadedAt)} · ${m.formattedSize || formatSize(m.fileSize)}</div>
+                </div>
+                <div class="file-actions">
+                  <span class="ext-chip">${m.extension || extOf(m.originalName)}</span>
+                  ${m.extension === 'pdf' ? `<button class="btn btn-sm btn-ghost" onclick="openPreview('${m._id}')">Preview</button>` : ''}
+                  <a class="btn btn-sm btn-primary" href="${m.fileUrl}" target="_blank" rel="noopener" download>Download</a>
+                </div>
+              </div>`).join('') : '<div class="file-empty">Nothing filed yet</div>'}
+          </div>`).join('');
+
+        html += `
+          <div class="drawer ${subj.id} ${open ? 'open' : ''}">
+            <div class="drawer-face" data-drawer>
+              <span class="drawer-tab">${subj.tag}</span>
+              <h3>${subj.name}</h3>
+              <span class="drawer-count">${files.length} file${files.length === 1 ? '' : 's'}</span>
+              <span class="drawer-arrow">▾</span>
+            </div>
+            <div class="drawer-body">
+              <div class="folders">${foldersHtml}</div>
+            </div>
+          </div>`;
+      });
+
+      cabinet.innerHTML = html;
+      document.getElementById('no-results').style.display = anyDrawer ? 'none' : 'block';
+
+      // Delegated accordion
+      cabinet.querySelectorAll('[data-drawer]').forEach(face => {
+        face.addEventListener('click', () => {
+          const drawer = face.closest('.drawer');
+          const wasOpen = drawer.classList.contains('open');
+          cabinet.querySelectorAll('.drawer.open').forEach(d => d.classList.remove('open'));
+          if (!wasOpen) drawer.classList.add('open');
+        });
+      });
+    }
+
+    // ── Search/filter listeners
+    const debouncedRender = debounce(renderCabinet, 260);
+    document.getElementById('search-input').addEventListener('input', debouncedRender);
+    document.getElementById('filter-subject').addEventListener('change', renderCabinet);
+    document.getElementById('filter-category').addEventListener('change', renderCabinet);
+
+    // ── Preview modal
+    function openPreview(id) {
+      const m = allMaterials.find(x => x._id === id);
+      if (!m) return;
+      document.getElementById('modal-title').textContent = m.title;
+      document.getElementById('modal-download').href = m.fileUrl;
+      document.getElementById('modal-meta').innerHTML = `
+        <span><strong>Subject:</strong> ${subjectById(m.subject).name}</span>
+        <span><strong>Category:</strong> ${m.category}</span>
+        <span><strong>Faculty:</strong> ${m.facultyName}</span>
+        <span><strong>Uploaded:</strong> ${formatDate(m.uploadedAt)}</span>
+        <span><strong>Size:</strong> ${m.formattedSize || formatSize(m.fileSize)}</span>`;
+
+      const preview = document.getElementById('modal-preview');
+      if (m.extension === 'pdf' || m.fileType === 'application/pdf') {
+        preview.innerHTML = `<iframe src="${m.fileUrl}" title="${m.title}"></iframe>`;
+      } else {
+        preview.innerHTML = `
+          <div class="no-preview">
+            <p>Preview not available for .${m.extension || 'this file type'} files.</p>
+            <a class="btn btn-primary btn-sm" href="${m.fileUrl}" target="_blank" rel="noopener" download>Download to view</a>
+          </div>`;
+      }
+      document.getElementById('preview-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePreview() {
+      document.getElementById('preview-modal').classList.remove('open');
+      document.getElementById('modal-preview').innerHTML = '';
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('modal-close').addEventListener('click', closePreview);
+    document.getElementById('modal-close-btn').addEventListener('click', closePreview);
+    document.getElementById('preview-modal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closePreview();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
+
+    loadMaterials();
+  </script>
+</body>
+</html>

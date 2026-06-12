@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faculty — CSM</title>
+  <link rel="stylesheet" href="public/css/main.css" />
+  <style>
+    /* ── Auth view ──────────────────────────────────────── */
+    #view-auth { display: none; }
+    #view-auth.active { display: block; }
+    .auth-wrap { display: flex; justify-content: center; padding: 60px 0 100px; }
+
+    .auth-form-panel { display: none; flex-direction: column; gap: 14px; }
+    .auth-form-panel.active { display: flex; animation: fadeUp .3s ease both; }
+
+    .auth-form-panel .btn-primary { width: 100%; justify-content: center; border: none; }
+    .auth-note { font-family: var(--mono); font-size: .72rem; color: var(--ink-soft); text-align: center; margin-top: 16px; line-height: 1.7; }
+
+    .demo-hint {
+      background: rgba(42,33,24,.05);
+      border: 1px dashed var(--manila-line);
+      border-radius: 4px; padding: 12px 14px;
+      font-family: var(--mono); font-size: .7rem; color: var(--ink-soft);
+      line-height: 1.8; margin-top: 18px;
+    }
+    .demo-hint strong { color: var(--ink); }
+
+    /* ── Dashboard ──────────────────────────────────────── */
+    #view-dashboard { display: none; }
+    #view-dashboard.active { display: block; }
+    .dashboard { padding: 48px 0 100px; }
+
+    .dash-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 18px; margin-bottom: 36px;
+      padding-bottom: 26px; border-bottom: 1px solid rgba(244,236,217,.1);
+    }
+    .faculty-id { display: flex; align-items: center; gap: 14px; }
+    .faculty-badge {
+      font-family: var(--mono); font-size: .68rem; letter-spacing: .14em;
+      text-transform: uppercase; padding: 7px 13px; border-radius: 3px;
+      color: var(--ink); font-weight: 600;
+    }
+    .faculty-id h2 { font-size: 1.25rem; font-weight: 600; }
+    .faculty-id p  { font-family: var(--mono); font-size: .74rem; color: var(--cream-soft); }
+
+    /* Upload card */
+    .upload-card {
+      background: var(--manila); color: var(--ink);
+      border-radius: 6px; padding: 26px 28px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      margin-bottom: 44px;
+    }
+    .upload-card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 4px; }
+    .upload-card > p { color: var(--ink-soft); font-size: .86rem; margin-bottom: 20px; }
+    .upload-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-bottom: 16px;
+    }
+    .upload-grid .field:first-child { grid-column: span 2; }
+    .upload-submit-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 4px; }
+    .upload-submit-row .btn { border: none; }
+
+    /* Manage section */
+    .manage-head { margin-bottom: 24px; }
+    .manage-head h3 { font-size: 1.1rem; font-weight: 600; color: var(--cream); }
+    .manage-head p  { color: var(--cream-soft); font-size: .86rem; }
+
+    .manage-cabinet {
+      background: var(--manila); border-radius: 6px;
+      overflow: hidden; box-shadow: 0 10px 24px rgba(0,0,0,.25);
+    }
+    .manage-cabinet .folders { grid-template-columns: repeat(3,1fr); padding: 6px 22px 26px; }
+
+    /* Edit modal */
+    .edit-modal-backdrop {
+      display: none; position: fixed; inset: 0; z-index: 700;
+      background: rgba(13,19,18,.78); align-items: center; justify-content: center; padding: 20px;
+    }
+    .edit-modal-backdrop.open { display: flex; }
+    .edit-modal {
+      background: var(--manila); color: var(--ink);
+      border-radius: 6px; width: min(92vw, 480px); padding: 28px 30px;
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+      animation: fadeUp .3s ease both;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .edit-modal h3 { font-size: 1.05rem; font-weight: 600; }
+    .edit-modal .btn-row { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+
+    @media (max-width: 660px) {
+      .upload-grid { grid-template-columns: 1fr; }
+      .upload-grid .field:first-child { grid-column: span 1; }
+      .manage-cabinet .folders { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header id="topnav" class="topnav"></header>
+
+  <!-- ─── AUTH ─────────────────────────────────────────────────────── -->
+  <div id="view-auth">
+    <div class="wrap auth-wrap">
+      <div class="auth-card">
+        <div class="auth-inner">
+          <p class="eyebrow" style="margin-bottom:12px;">Faculty Access</p>
+          <h2 style="font-family:var(--stamp);font-size:1.9rem;margin-bottom:18px;">Filing Room</h2>
+
+          <div class="auth-tabs">
+            <button class="active" data-tab="login">Sign In</button>
+            <button data-tab="signup">Register</button>
+          </div>
+
+          <div id="auth-msg" class="form-msg"></div>
+
+          <!-- Login form -->
+          <div class="auth-form-panel active" id="login-panel">
+            <div class="field">
+              <label for="login-username">Username</label>
+              <input id="login-username" type="text" placeholder="your.username" autocomplete="username" />
+            </div>
+            <div class="field">
+              <label for="login-password">Password</label>
+              <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" />
+            </div>
+            <button class="btn btn-primary" id="login-btn">Open the Drawer</button>
+            <p class="auth-note">Only registered faculty can log in.<br>Students browse freely — no login needed.</p>
+          </div>
+
+          <!-- Signup form -->
+          <div class="auth-form-panel" id="signup-panel">
+            <div class="field">
+              <label for="signup-name">Full Name</label>
+              <input id="signup-name" type="text" placeholder="Prof. A. Sharma" />
+            </div>
+            <div class="field">
+              <label for="signup-subject">Your Subject</label>
+              <select id="signup-subject">
+                <option value="" disabled selected>Select subject</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="signup-username">Username</label>
+              <input id="signup-username" type="text" placeholder="prof.sharma" autocomplete="username" />
+            </div>
+            <div class="field">
+              <label for="signup-password">Password (min 6 characters)</label>
+              <input id="signup-password" type="password" placeholder="••••••••" autocomplete="new-password" />
+            </div>
+            <button class="btn btn-primary" id="signup-btn">Issue Faculty Card</button>
+            <p class="auth-note">Registration is open to all faculty.<br>You'll be able to manage your subject's materials.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── DASHBOARD ─────────────────────────────────────────────────── -->
+  <div id="view-dashboard">
+    <div class="wrap dashboard">
+
+      <!-- Header -->
+      <div class="dash-header">
+        <div class="faculty-id">
+          <span class="faculty-badge" id="faculty-badge"></span>
+          <div>
+            <h2 id="faculty-name">Faculty Name</h2>
+            <p id="faculty-subject">Subject · Faculty Access</p>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="logout-btn">Log Out</button>
+      </div>
+
+      <!-- Upload -->
+      <div class="upload-card">
+        <h3>File a New Material</h3>
+        <p>Upload notes, PPTs, or assignments. Students see it the moment you save.</p>
+
+        <div id="upload-msg" class="form-msg"></div>
+
+        <div class="upload-grid">
+          <div class="field" style="grid-column:span 2">
+            <label for="upload-title">File Title</label>
+            <input id="upload-title" type="text" placeholder="e.g. Unit 3 — Collections Framework" />
+          </div>
+          <div class="field">
+            <label for="upload-category">Category</label>
+            <select id="upload-category">
+              <option value="" disabled selected>Choose category</option>
+              <option>Notes</option>
+              <option>PPTs</option>
+              <option>Assignments</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>File <span style="color:var(--ink-soft)">(PDF, DOC, DOCX, PPT, PPTX, ZIP · max 50 MB)</span></label>
+            <div class="file-drop" id="file-drop">
+              <strong id="file-drop-label">Click to choose a file, or drag it here</strong>
+              <span>PDF · DOC · PPT · ZIP</span>
+              <input type="file" id="upload-file" accept=".pdf,.doc,.docx,.ppt,.pptx,.zip" />
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-submit-row">
+          <button class="btn btn-primary" id="upload-btn">File It</button>
+          <div id="upload-spinner" style="display:none;"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- Manage -->
+      <div class="manage-head">
+        <h3>Your Filed Materials</h3>
+        <p>All materials you have uploaded. Edit the title/category or remove a file.</p>
+      </div>
+      <div class="manage-cabinet">
+        <div id="manage-folders" class="folders"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Edit modal -->
+  <div class="edit-modal-backdrop" id="edit-modal">
+    <div class="edit-modal">
+      <h3>Edit Material</h3>
+      <input type="hidden" id="edit-id" />
+      <div class="field">
+        <label for="edit-title">Title</label>
+        <input id="edit-title" type="text" />
+      </div>
+      <div class="field">
+        <label for="edit-category">Category</label>
+        <select id="edit-category">
+          <option>Notes</option>
+          <option>PPTs</option>
+          <option>Assignments</option>
+        </select>
+      </div>
+      <div id="edit-msg" class="form-msg"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" id="edit-cancel">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="edit-save">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="public/js/shared.js"></script>
+  <script>
+    // ── Populate subject selects
+    SUBJECTS.forEach(s => {
+      document.getElementById('signup-subject').insertAdjacentHTML('beforeend',
+        `<option value="${s.id}">${s.name}</option>`);
+    });
+
+    // ── Auth tab switching
+    document.querySelectorAll('.auth-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.auth-tabs button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.auth-form-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab + '-panel').classList.add('active');
+        document.getElementById('auth-msg').className = 'form-msg';
+      });
+    });
+
+    // ── View switcher
+    function showView(view) {
+      document.getElementById('view-auth').classList.toggle('active', view === 'auth');
+      document.getElementById('view-dashboard').classList.toggle('active', view === 'dashboard');
+    }
+
+    function initPage() {
+      buildNav('faculty');
+      if (authIsLoggedIn()) {
+        showView('dashboard');
+        loadDashboard();
+      } else {
+        showView('auth');
+      }
+    }
+
+    // ── Login
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      const msg      = document.getElementById('auth-msg');
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      if (!username || !password) {
+        msg.textContent = 'Please enter username and password.';
+        msg.className = 'form-msg error show'; return;
+      }
+      try {
+        const { token, faculty } = await API.login({ username, password });
+        authSetSession(token, faculty);
+        msg.className = 'form-msg';
+        showStamp('Access<br>Granted', `Opening the ${subjectById(faculty.subject).name} drawer…`, () => {
+          buildNav('faculty');
+          showView('dashboard');
+          loadDashboard();
+        });
+      } catch (err) {
+        msg.textContent = err.message;
+        msg.className = 'form-msg error show';
+      }
+    });
+
+    // ── Signup
+    document.getElementById('signup-btn').addEventListener('click', async () => {
+      const msg      = document.getElementById('auth-msg');
+      const name     = document.getElementById('signup-name').value.trim();
+      const subject  = document.getElementById('signup-subject').value;
+      const username = document.getElementById('signup-username').value.trim();
+      const password = document.getElementById('signup-password').value;
+      if (!name || !subject || !username || !password) {
+        msg.textContent = 'Please fill in every field.';
+        msg.className = 'form-msg error show'; return;
+      }
+      try {
+        const { token, faculty } = await API.signup({ name, subject, username, password });
+        authSetSession(token, faculty);
+        msg.className = 'form-msg';
+        showStamp('Card<br>Issued', `Welcome — opening the ${subjectById(faculty.subject).name} drawer…`, () => {
+          buildNav('faculty');
+          showView('dashboard');
+          loadDashboard();
+        });
+      } catch (err) {
+        msg.textContent = err.message;
+        msg.className = 'form-msg error show';
+      }
+    });
+
+    // ── Allow Enter key on login
+    ['login-username','login-password'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('login-btn').click();
+      });
+    });
+
+    // ── Logout
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      authClear();
+      buildNav('faculty');
+      showView('auth');
+      showToast('Logged out. The drawer is locked.');
+    });
+
+    // ── Dashboard
+    async function loadDashboard() {
+      const fac = authGetFaculty();
+      if (!fac) return;
+      const subj = subjectById(fac.subject);
+
+      const badge = document.getElementById('faculty-badge');
+      badge.textContent = subj.tag;
+      badge.style.background = `var(--${subj.id})`;
+      document.getElementById('faculty-name').textContent = fac.name;
+      document.getElementById('faculty-subject').textContent = `${subj.name} · Faculty Access`;
+
+      renderMyMaterials();
+    }
+
+    async function renderMyMaterials() {
+      const container = document.getElementById('manage-folders');
+      container.innerHTML = `<div style="padding:20px;"><div class="spinner" style="border-color:rgba(42,33,24,.2);border-top-color:var(--ink);"></div></div>`;
+      try {
+        const { data } = await API.getMyMaterials();
+        const fac = authGetFaculty();
+        const subj = subjectById(fac.subject);
+        const byCategory = { Notes: [], PPTs: [], Assignments: [] };
+        data.forEach(m => { if (byCategory[m.category]) byCategory[m.category].push(m); });
+
+        container.innerHTML = Object.entries(byCategory).map(([cat, items]) => `
+          <div class="folder">
+            <h4>${cat}</h4>
+            ${items.length ? items.map(m => `
+              <div class="file-row">
+                <div class="file-left">
+                  <div class="file-name">${m.title}</div>
+                  <div class="file-meta">${formatDate(m.uploadedAt)} · ${m.formattedSize || formatSize(m.fileSize)}</div>
+                </div>
+                <div class="file-actions">
+                  <span class="ext-chip">${m.extension || extOf(m.originalName)}</span>
+                  <button class="btn btn-sm btn-ghost" onclick="openEdit('${m._id}','${encodeURIComponent(m.title)}','${m.category}')">Edit</button>
+                  <button class="btn btn-sm btn-danger" onclick="deleteFile('${m._id}')">Delete</button>
+                </div>
+              </div>`).join('') : '<div class="file-empty">Nothing filed yet</div>'}
+          </div>`).join('');
+      } catch (err) {
+        container.innerHTML = `<div class="file-empty" style="padding:16px;">${err.message}</div>`;
+      }
+    }
+
+    // ── File drop zone
+    const fileInput  = document.getElementById('upload-file');
+    const dropZone   = document.getElementById('file-drop');
+    const dropLabel  = document.getElementById('file-drop-label');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) dropLabel.textContent = fileInput.files[0].name;
+    });
+    ['dragover','dragleave','drop'].forEach(evt => {
+      dropZone.addEventListener(evt, e => {
+        e.preventDefault(); e.stopPropagation();
+        if (evt === 'dragover') dropZone.classList.add('drag');
+        else dropZone.classList.remove('drag');
+        if (evt === 'drop' && e.dataTransfer.files[0]) {
+          fileInput.files = e.dataTransfer.files;
+          dropLabel.textContent = e.dataTransfer.files[0].name;
+        }
+      });
+    });
+
+    // ── Upload
+    document.getElementById('upload-btn').addEventListener('click', async () => {
+      const msg      = document.getElementById('upload-msg');
+      const spinner  = document.getElementById('upload-spinner');
+      const btn      = document.getElementById('upload-btn');
+      const file     = fileInput.files[0];
+      const title    = document.getElementById('upload-title').value.trim();
+      const category = document.getElementById('upload-category').value;
+      const fac      = authGetFaculty();
+
+      if (!fac) { showView('auth'); return; }
+      if (!title) {
+        msg.textContent = 'Please enter a title for this file.';
+        msg.className = 'form-msg error show'; return;
+      }
+      if (!category) {
+        msg.textContent = 'Please select a category.';
+        msg.className = 'form-msg error show'; return;
+      }
+      if (!file) {
+        msg.textContent = 'Please choose a file to upload.';
+        msg.className = 'form-msg error show'; return;
+      }
+
+      btn.disabled = true;
+      spinner.style.display = 'block';
+      msg.className = 'form-msg';
+
+      try {
+        const form = new FormData();
+        form.append('file', file);
+        form.append('title', title);
+        form.append('category', category);
+        form.append('subject', fac.subject);
+        form.append('semester', '5');
+
+        await API.uploadMaterial(form);
+
+        msg.textContent = `"${title}" filed under ${category} — students can see it now.`;
+        msg.className = 'form-msg success show';
+        document.getElementById('upload-title').value = '';
+        document.getElementById('upload-category').value = '';
+        fileInput.value = '';
+        dropLabel.textContent = 'Click to choose a file, or drag it here';
+        showToast('Filed — visible to students immediately.');
+        renderMyMaterials();
+      } catch (err) {
+        msg.textContent = err.message;
+        msg.className = 'form-msg error show';
+      } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+      }
+    });
+
+    // ── Edit
+    function openEdit(id, encodedTitle, category) {
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-title').value = decodeURIComponent(encodedTitle);
+      document.getElementById('edit-category').value = category;
+      document.getElementById('edit-msg').className = 'form-msg';
+      document.getElementById('edit-modal').classList.add('open');
+    }
+    document.getElementById('edit-cancel').addEventListener('click', () => {
+      document.getElementById('edit-modal').classList.remove('open');
+    });
+    document.getElementById('edit-save').addEventListener('click', async () => {
+      const id       = document.getElementById('edit-id').value;
+      const title    = document.getElementById('edit-title').value.trim();
+      const category = document.getElementById('edit-category').value;
+      const msg      = document.getElementById('edit-msg');
+      if (!title) { msg.textContent = 'Title cannot be empty.'; msg.className = 'form-msg error show'; return; }
+      try {
+        await API.updateMaterial(id, { title, category });
+        document.getElementById('edit-modal').classList.remove('open');
+        showToast('Material updated.');
+        renderMyMaterials();
+      } catch (err) {
+        msg.textContent = err.message;
+        msg.className = 'form-msg error show';
+      }
+    });
+
+    // ── Delete
+    async function deleteFile(id) {
+      if (!confirm('Remove this file? This cannot be undone.')) return;
+      try {
+        await API.deleteMaterial(id);
+        showToast('File removed from the drawer.');
+        renderMyMaterials();
+      } catch (err) {
+        showToast('Could not delete: ' + err.message);
+      }
+    }
+
+    initPage();
+  </script>
+</body>
+</html>

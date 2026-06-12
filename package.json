@@ -1,0 +1,11 @@
+{
+  "name": "csm",
+  "version": "1.0.0",
+  "description": "College Study Material Management System",
+  "scripts": {
+    "backend": "cd backend && npm run dev",
+    "frontend": "npx serve frontend --listen 3000",
+    "install:backend": "cd backend && npm install",
+    "setup": "npm run install:backend && echo '\n✅ Backend deps installed.\nNext: cp backend/.env.example backend/.env and fill in your values.'"
+  }
+}

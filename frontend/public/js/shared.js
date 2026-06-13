@@ -5,7 +5,7 @@
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
-const API_BASE = 'https://csm-j182.onrender.com/api';
+const API_BASE = 'https://csm-j182.onrender.com/api'; // Change to your deployed backend URL
 
 const SUBJECTS = [
   { id: 'java',    name: 'Java Programming',           tag: 'JAVA',    semester: 5 },
@@ -123,7 +123,7 @@ function buildNav(activePage) {
   const userHtml = fac
     ? `<span class="nav-user">Signed in as <strong>${fac.name}</strong></span>
        <button class="btn btn-ghost btn-sm" id="nav-logout">Log Out</button>`
-    : `<a href="faculty.html" class="${activePage === 'faculty' ? 'active' : ''}">Faculty</a>`;
+    : `<a href="faculty.html" class="nav-faculty ${activePage === 'faculty' ? 'active' : ''}">Faculty ▸</a>`;
 
   nav.innerHTML = `
     <div class="wrap">

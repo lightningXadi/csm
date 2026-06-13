@@ -5,7 +5,7 @@
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
-const API_BASE = 'https://csm-j182.onrender.com/api'; // Change to your deployed backend URL
+const API_BASE = 'https://csm-j182.onrender.com/api';// Change to your deployed backend URL
 
 const SUBJECTS = [
   { id: 'java',    name: 'Java Programming',           tag: 'JAVA',    semester: 5 },

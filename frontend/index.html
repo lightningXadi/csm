@@ -74,24 +74,11 @@
     .tab-strip span:nth-child(4){ background: var(--cyber); }
     .tab-strip span:nth-child(5){ background: var(--erp); }
 
-    /* ── Problem section ──────────────────────── */
-    .problem { background: var(--bg-deep); padding: 100px 0; }
-    .compare { display: grid; grid-template-columns: 1.1fr auto 1fr; align-items: center; gap: 40px; }
-    .scrap-pile { position: relative; height: 300px; }
-    .scrap {
-      position: absolute; width: 78%;
-      padding: 16px 18px;
-      background: var(--manila); color: var(--ink);
-      font-family: var(--stamp); font-size: .9rem; line-height: 1.4;
-      box-shadow: 0 14px 30px rgba(0,0,0,.35);
-      clip-path: polygon(2% 4%, 98% 0%, 100% 96%, 1% 100%);
-    }
-    .scrap .meta { display: block; margin-top: 8px; font-family: var(--mono); font-size: .65rem; letter-spacing: .08em; color: var(--ink-soft); text-transform: uppercase; }
-    .scrap.s1{ top:0;    left:0;   transform: rotate(-7deg); z-index:1; }
-    .scrap.s2{ top:65px; left:25%; transform: rotate(4deg);  background:#e6d6b8; z-index:2; }
-    .scrap.s3{ top:140px;left:3%;  transform: rotate(-3deg); background:#dfcca7; z-index:3; }
-    .scrap.s4{ top:215px;left:20%; transform: rotate(6deg);  background:#e9dcc0; z-index:4; }
-    .vs-arrow { font-family: var(--mono); font-size: 2rem; color: var(--cream-soft); }
+    /* ── Pitch (condensed problem statement) ──── */
+    .pitch { background: var(--bg-deep); padding: 80px 0; }
+    .pitch-grid { display: grid; grid-template-columns: 1.2fr 1fr; align-items: center; gap: 48px; }
+    .pitch-copy h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 600; margin: 10px 0 14px; letter-spacing: -.01em; }
+    .pitch-copy p { color: var(--cream-soft); max-width: 46ch; font-size: 1.02rem; }
     .index-card {
       background: var(--manila); color: var(--ink);
       border-radius: 4px; padding: 26px 24px;
@@ -110,6 +97,8 @@
 
     /* ── Recent uploads ───────────────────────── */
     .recent { padding: 100px 0; }
+    .recent-top { padding-top: 60px; }
+    .recent-top .section-head h2 { font-family: var(--stamp); letter-spacing: .03em; }
     .recent-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
     .recent-card {
       background: var(--manila); color: var(--ink);
@@ -160,7 +149,7 @@
     /* ── Roles ────────────────────────────────── */
     .roles { padding: 100px 0; }
     .role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; }
-    @media (max-width: 700px) { .role-grid { grid-template-columns: 1fr; } .compare { grid-template-columns: 1fr; } .vs-arrow { transform: rotate(90deg); text-align: center; } .scrap-pile { height: 240px; } }
+    @media (max-width: 700px) { .role-grid { grid-template-columns: 1fr; } .pitch-grid { grid-template-columns: 1fr; gap: 32px; } }
     .perm-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .perm-list li { display: flex; gap: 10px; font-size: .92rem; }
     .perm-list li .mark { font-family: var(--mono); flex: 0 0 20px; }
@@ -182,7 +171,6 @@
       <p class="tagline">One clean place for notes, PPTs, and assignments. No WhatsApp hunting. No missed links. Just open and study.</p>
       <div class="cta-row">
         <a href="browse.html" class="btn btn-primary">Browse Materials</a>
-        <a href="faculty.html" class="btn btn-ghost">For Faculty →</a>
       </div>
       <div class="tab-strip">
         <span>Java</span>
@@ -194,37 +182,8 @@
     </div>
   </section>
 
-  <!-- ─── PROBLEM ─────────────────────────────────────────────────── -->
-  <section class="problem">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <p class="eyebrow">The Problem</p>
-        <h2>Stop digging through messages.</h2>
-        <p>Materials scattered across WhatsApp, Telegram, email, and personal chats — now filed in one place.</p>
-      </div>
-      <div class="compare reveal">
-        <div class="scrap-pile">
-          <div class="scrap s1">Unit 3 notes forwarded by Priya 📎<span class="meta">WhatsApp · 2 days ago</span></div>
-          <div class="scrap s2">RE: Assignment 2 — see attachment<span class="meta">Email · last week</span></div>
-          <div class="scrap s3">Unit 1 PPT — did anyone save it?<span class="meta">Telegram group · 4 days ago</span></div>
-          <div class="scrap s4">Testing syllabus PDF?? anyone??<span class="meta">Instagram DM · yesterday</span></div>
-        </div>
-        <div class="vs-arrow">→</div>
-        <div class="index-card">
-          <span class="ic-tag">Java · Notes</span>
-          <h3>Unit 3 — Collections Framework</h3>
-          <p>ArrayList, LinkedList, HashMap — complete lecture notes with examples.</p>
-          <div class="ic-row">
-            <span>Prof. A. Sharma · 14 Jun</span>
-            <a href="browse.html" class="btn btn-sm btn-primary">Download</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- ─── RECENT UPLOADS ──────────────────────────────────────────── -->
-  <section class="recent">
+  <section class="recent recent-top">
     <div class="wrap">
       <div class="section-head reveal">
         <p class="eyebrow">Just Filed</p>
@@ -250,6 +209,28 @@
         <p>Five subjects, three categories each. Click any subject to see its materials.</p>
       </div>
       <div class="subject-grid reveal" id="subject-grid"></div>
+    </div>
+  </section>
+
+  <!-- ─── PITCH ───────────────────────────────────────────────────── -->
+  <section class="pitch">
+    <div class="wrap">
+      <div class="pitch-grid reveal">
+        <div class="pitch-copy">
+          <p class="eyebrow">The Problem</p>
+          <h2>Stop digging through messages.</h2>
+          <p>Materials scattered across WhatsApp, Telegram, email, and personal chats — now filed in one place. No more "did anyone save the PPT?" two days before the exam.</p>
+        </div>
+        <div class="index-card">
+          <span class="ic-tag">Java · Notes</span>
+          <h3>Unit 3 — Collections Framework</h3>
+          <p>ArrayList, LinkedList, HashMap — complete lecture notes with examples.</p>
+          <div class="ic-row">
+            <span>Prof. A. Sharma · 14 Jun</span>
+            <a href="browse.html" class="btn btn-sm btn-primary">Download</a>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

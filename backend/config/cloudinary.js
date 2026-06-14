@@ -26,6 +26,8 @@ const storage = new CloudinaryStorage({
     return {
       folder: `csm/sem${req.body.semester || 5}/${req.body.subject}/${req.body.category}`,
       resource_type: 'raw',         // required for non-image files
+      type: 'upload',                // public delivery (not authenticated/private)
+      access_mode: 'public',
       public_id: `${Date.now()}-${file.originalname.replace(/\s+/g, '_')}`,
       use_filename: false,
     };

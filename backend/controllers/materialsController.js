@@ -75,6 +75,32 @@ const getMaterial = async (req, res) => {
   }
 };
 
+// GET /api/materials/:id/download
+// Generates a signed Cloudinary URL (works even if raw delivery requires auth)
+// and redirects the browser to it so the file downloads with its original name.
+const downloadMaterial = async (req, res) => {
+  try {
+    const material = await Material.findById(req.params.id).lean();
+    if (!material) {
+      return res.status(404).json({ success: false, message: 'Material not found.' });
+    }
+
+    const signedUrl = cloudinary.utils.private_download_url(
+      material.publicId,
+      material.extension,
+      {
+        resource_type: 'raw',
+        type: 'upload',
+        attachment: true,
+      }
+    );
+
+    res.redirect(signedUrl);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 // ─── FACULTY-PROTECTED routes ────────────────────────────────────────────────
 
 // POST /api/materials  (multipart/form-data)
@@ -179,6 +205,7 @@ module.exports = {
   getAllMaterials,
   getRecentMaterials,
   getMaterial,
+  downloadMaterial,
   uploadMaterial,
   updateMaterial,
   deleteMaterial,

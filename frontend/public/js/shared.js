@@ -91,7 +91,7 @@ function showToast(msg, duration = 3000) {
 
 // ─── Stamp Overlay ────────────────────────────────────────────────────────────
 
-function showStamp(headline, sub, callback, delay = 1800) {
+function showStamp(headline, sub, callback, delay = 950) {
   let overlay = document.getElementById('stamp-overlay');
   if (!overlay) {
     overlay = document.createElement('div');
@@ -121,9 +121,10 @@ function buildNav(activePage) {
   if (!nav) return;
   const fac = authGetFaculty();
   const userHtml = fac
-    ? `<span class="nav-user">Signed in as <strong>${fac.name}</strong></span>
-       <button class="btn btn-ghost btn-sm" id="nav-logout">Log Out</button>
-       <a href="faculty.html" class="nav-faculty ${activePage === 'faculty' ? 'active' : ''}">Dashboard ▸</a>`
+    ? `<a href="faculty.html" class="nav-faculty nav-dash ${activePage === 'faculty' ? 'active' : ''}">
+         <span class="nav-dash-name">${fac.name}</span><span class="nav-dash-label">Dashboard ▸</span>
+       </a>
+       <button class="nav-logout-link" id="nav-logout" title="Log out">Log Out</button>`
     : `<a href="faculty.html" class="nav-faculty ${activePage === 'faculty' ? 'active' : ''}">Faculty ▸</a>`;
 
   nav.innerHTML = `

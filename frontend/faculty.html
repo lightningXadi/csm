@@ -480,11 +480,11 @@
 
       try {
         const form = new FormData();
-        form.append('file', file);
         form.append('title', title);
         form.append('category', category);
         form.append('subject', fac.subject);
         form.append('semester', '5');
+        form.append('file', file);
 
         await API.uploadMaterial(form);
 

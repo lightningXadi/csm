@@ -169,7 +169,7 @@
                 <div class="file-actions">
                   <span class="ext-chip">${m.extension || extOf(m.originalName)}</span>
                   ${m.extension === 'pdf' ? `<button class="btn btn-sm btn-ghost-dark" onclick="openPreview('${m._id}')">Preview</button>` : ''}
-                  <a class="btn btn-sm btn-primary" href="${m.fileUrl}" target="_blank" rel="noopener" download>Download</a>
+                  <a class="btn btn-sm btn-primary" href="${API_BASE}/materials/${m._id}/download" target="_blank" rel="noopener">Download</a>
                 </div>
               </div>`).join('') : '<div class="file-empty">Nothing filed yet</div>'}
           </div>`).join('');
@@ -213,7 +213,7 @@
       const m = allMaterials.find(x => x._id === id);
       if (!m) return;
       document.getElementById('modal-title').textContent = m.title;
-      document.getElementById('modal-download').href = m.fileUrl;
+      document.getElementById('modal-download').href = `${API_BASE}/materials/${m._id}/download`;
       document.getElementById('modal-meta').innerHTML = `
         <span><strong>Subject:</strong> ${subjectById(m.subject).name}</span>
         <span><strong>Category:</strong> ${m.category}</span>
@@ -223,12 +223,12 @@
 
       const preview = document.getElementById('modal-preview');
       if (m.extension === 'pdf' || m.fileType === 'application/pdf') {
-        preview.innerHTML = `<iframe src="${m.fileUrl}" title="${m.title}"></iframe>`;
+        preview.innerHTML = `<iframe src="${API_BASE}/materials/${m._id}/download" title="${m.title}"></iframe>`;
       } else {
         preview.innerHTML = `
           <div class="no-preview">
             <p>Preview not available for .${m.extension || 'this file type'} files.</p>
-            <a class="btn btn-primary btn-sm" href="${m.fileUrl}" target="_blank" rel="noopener" download>Download to view</a>
+            <a class="btn btn-primary btn-sm" href="${API_BASE}/materials/${m._id}/download" target="_blank" rel="noopener">Download to view</a>
           </div>`;
       }
       document.getElementById('preview-modal').classList.add('open');

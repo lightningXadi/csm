@@ -85,6 +85,8 @@ img, svg { display: block; max-width: 100%; }
 .btn:hover { transform: translateY(-2px); }
 .btn-primary  { background: var(--manila); color: var(--ink); }
 .btn-primary:hover { background: var(--cream); }
+.btn:disabled { opacity: .6; cursor: default; }
+.btn:disabled:hover { background: var(--manila); }
 .btn-ghost    { border-color: rgba(244,236,217,.3); color: var(--cream); }
 .btn-ghost:hover { border-color: var(--cream); }
 .btn-danger   { background: none; border-color: rgba(177,71,47,.4); color: var(--red); }
@@ -195,13 +197,39 @@ textarea { resize: vertical; min-height: 80px; }
 .nav-faculty:hover { opacity: 1; }
 .nav-faculty:hover, .nav-faculty.active { color: var(--manila); }
 .nav-faculty.active { opacity: 1; }
-.nav-user {
-  font-family: var(--mono);
-  font-size: .7rem;
-  color: var(--cream-soft);
-  letter-spacing: .06em;
+.nav-dash {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.3;
+  gap: 1px;
+  padding-top: 6px;
+  padding-bottom: 6px;
 }
-.nav-user strong { color: var(--manila); }
+.nav-dash-name {
+  font-family: var(--serif);
+  font-size: .82rem;
+  font-style: italic;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--cream-soft);
+}
+.nav-dash-label { font-size: .72rem; }
+.nav-logout-link {
+  font-family: var(--mono);
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--red);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+  opacity: .75;
+  transition: opacity .2s;
+}
+.nav-logout-link:hover { opacity: 1; }
 /* Hamburger for mobile */
 .nav-toggle {
   display: none;
@@ -441,7 +469,7 @@ textarea { resize: vertical; min-height: 80px; }
   opacity: 0;
 }
 .stamp-overlay.show .stamp-card {
-  animation: cardPop .45s ease both, cardShake .4s .75s ease;
+  animation: cardPop .3s ease both, cardShake .35s .45s ease;
 }
 .stamp-card .ruled {
   position: absolute; inset: 0;
@@ -464,7 +492,7 @@ textarea { resize: vertical; min-height: 80px; }
   mix-blend-mode: multiply;
 }
 .stamp-overlay.show .stamp-mark {
-  animation: stampDown .55s .35s cubic-bezier(.2,.9,.3,1.3) forwards;
+  animation: stampDown .4s .15s cubic-bezier(.2,.9,.3,1.3) forwards;
 }
 .stamp-sub {
   position: absolute;
@@ -601,6 +629,8 @@ textarea { resize: vertical; min-height: 80px; }
     margin-top: 6px;
   }
   .nav-user { padding: 14px 28px; }
+  .nav-dash { align-items: flex-start; padding: 14px 28px 4px; }
+  .nav-logout-link { width: 100%; text-align: left; padding: 10px 28px; }
   .nav-toggle { display: flex; z-index: 600; }
   .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .nav-toggle.open span:nth-child(2) { opacity: 0; }

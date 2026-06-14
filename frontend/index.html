@@ -303,7 +303,7 @@
             <div class="rc-meta">${m.facultyName} · ${formatDate(m.uploadedAt)}</div>
             <div class="rc-footer">
               <span class="ext-chip">${m.extension || '—'}</span>
-              <a href="${m.fileUrl}" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Download</a>
+              <a href="${API_BASE}/materials/${m._id}/download" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Download</a>
             </div>
           </div>`;
         }).join('');

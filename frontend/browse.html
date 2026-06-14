@@ -223,7 +223,7 @@
 
       const preview = document.getElementById('modal-preview');
       if (m.extension === 'pdf' || m.fileType === 'application/pdf') {
-        preview.innerHTML = `<iframe src="${API_BASE}/materials/${m._id}/download" title="${m.title}"></iframe>`;
+        preview.innerHTML = `<iframe src="${API_BASE}/materials/${m._id}/download?inline=1" title="${m.title}"></iframe>`;
       } else {
         preview.innerHTML = `
           <div class="no-preview">

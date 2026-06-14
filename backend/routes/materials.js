@@ -6,6 +6,7 @@ const {
   getAllMaterials,
   getRecentMaterials,
   getMaterial,
+  downloadMaterial,
   uploadMaterial,
   updateMaterial,
   deleteMaterial,
@@ -16,6 +17,7 @@ const {
 router.get('/',         getAllMaterials);
 router.get('/recent',   getRecentMaterials);
 router.get('/:id',      getMaterial);
+router.get('/:id/download', downloadMaterial);
 
 // Protected (faculty)
 router.get('/faculty/mine',      protect, getMyMaterials);

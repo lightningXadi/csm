@@ -121,9 +121,7 @@ function buildNav(activePage) {
   if (!nav) return;
   const fac = authGetFaculty();
   const userHtml = fac
-    ? `<a href="faculty.html" class="nav-faculty nav-dash ${activePage === 'faculty' ? 'active' : ''}">
-         <span class="nav-dash-name">${fac.name}</span><span class="nav-dash-label">Dashboard ▸</span>
-       </a>
+    ? `<a href="faculty.html" class="nav-faculty ${activePage === 'faculty' ? 'active' : ''}">Dashboard ▸</a>
        <button class="nav-logout-link" id="nav-logout" title="Log out">Log Out</button>`
     : `<a href="faculty.html" class="nav-faculty ${activePage === 'faculty' ? 'active' : ''}">Faculty ▸</a>`;
 

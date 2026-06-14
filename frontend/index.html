@@ -9,7 +9,7 @@
     /* ── Hero ─────────────────────────────────── */
     .hero {
       position: relative;
-      min-height: calc(88vh - var(--nav-h));
+      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -22,7 +22,7 @@
       background-image: repeating-linear-gradient(180deg, rgba(244,236,217,.025) 0 1px, transparent 1px 38px);
       pointer-events: none;
     }
-    .hero-inner { position: relative; padding: 60px 0 80px; }
+    .hero-inner { position: relative; padding: calc(var(--nav-h) + 56px) 0 64px; }
     .hero h1 {
       font-family: var(--stamp);
       font-size: clamp(3.2rem, 12vw, 8rem);

@@ -144,23 +144,25 @@ textarea { resize: vertical; min-height: 80px; }
 }
 .nav-logo {
   font-family: var(--stamp);
-  font-size: 1.3rem;
-  letter-spacing: .04em;
+  font-size: 1.7rem;
+  letter-spacing: .06em;
   color: var(--cream);
   text-decoration: none;
 }
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 28px;
 }
 .nav-links a,
 .nav-links button {
+  position: relative;
   font-family: var(--mono);
-  font-size: .74rem;
-  letter-spacing: .12em;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--cream-soft);
+  color: var(--cream);
   background: none;
   border: none;
   cursor: pointer;
@@ -168,18 +170,31 @@ textarea { resize: vertical; min-height: 80px; }
   transition: color .2s;
   text-decoration: none;
 }
+.nav-links a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 100%; bottom: 0;
+  height: 2px;
+  background: var(--manila);
+  transition: right .2s ease;
+}
+.nav-links a:hover::after,
+.nav-links a.active::after { right: 0; }
 .nav-links a:hover,
 .nav-links button:hover,
-.nav-links a.active { color: var(--cream); }
+.nav-links a.active { color: var(--manila); }
 .nav-links a.active { color: var(--manila); }
 .nav-faculty {
   opacity: .6;
+  font-weight: 500;
   padding-left: 16px;
   border-left: 1px solid rgba(244,236,217,.14);
   letter-spacing: .1em;
 }
+.nav-faculty::after { display: none; }
 .nav-faculty:hover { opacity: 1; }
-.nav-faculty.active { opacity: 1; color: var(--manila); }
+.nav-faculty:hover, .nav-faculty.active { color: var(--manila); }
+.nav-faculty.active { opacity: 1; }
 .nav-user {
   font-family: var(--mono);
   font-size: .7rem;
@@ -197,7 +212,7 @@ textarea { resize: vertical; min-height: 80px; }
   gap: 5px;
   padding: 4px;
 }
-.nav-toggle span { display: block; width: 22px; height: 2px; background: var(--cream); border-radius: 2px; transition: .3s; }
+.nav-toggle span { display: block; width: 22px; height: 2px; background: var(--cream); border-radius: 2px; transition: transform .25s ease, opacity .25s ease; }
 
 /* ─── Cabinet / Drawer ───────────────────────────────────────────── */
 .cabinet { display: flex; flex-direction: column; gap: 10px; }
@@ -547,10 +562,49 @@ textarea { resize: vertical; min-height: 80px; }
 /* ─── Responsive ─────────────────────────────────────────────────── */
 @media (max-width: 760px) {
   .folders { grid-template-columns: 1fr; }
-  .nav-links { display: none; gap: 14px; flex-direction: column; position: fixed; top: var(--nav-h); left: 0; right: 0; background: var(--bg-deep); padding: 20px 28px 28px; border-bottom: 1px solid rgba(244,236,217,.08); }
-  .nav-links.open { display: flex; }
-  .nav-faculty { border-left: none; padding-left: 0; padding-top: 10px; border-top: 1px solid rgba(244,236,217,.14); margin-top: 4px; }
-  .nav-toggle { display: flex; }
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    flex-direction: column;
+    position: fixed;
+    top: var(--nav-h); left: 0; right: 0;
+    background: var(--bg-deep);
+    padding: 10px 0 18px;
+    border-bottom: 1px solid rgba(244,236,217,.08);
+    box-shadow: 0 16px 30px rgba(0,0,0,.35);
+    transform: translateY(-12px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform .22s ease, opacity .22s ease;
+  }
+  .nav-links.open {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  .nav-links a,
+  .nav-links button {
+    width: 100%;
+    padding: 14px 28px;
+    font-size: .82rem;
+    border-radius: 0;
+  }
+  .nav-links a::after { display: none; }
+  .nav-links a:hover,
+  .nav-links a.active { background: rgba(244,236,217,.06); }
+  .nav-faculty {
+    border-left: none;
+    padding-left: 28px;
+    border-top: 1px solid rgba(244,236,217,.14);
+    margin-top: 6px;
+  }
+  .nav-user { padding: 14px 28px; }
+  .nav-toggle { display: flex; z-index: 600; }
+  .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .nav-toggle.open span:nth-child(2) { opacity: 0; }
+  .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
   .auth-card { padding: 28px 22px; }
   .auth-card::before { display: none; }
   .auth-inner { padding-left: 0; }

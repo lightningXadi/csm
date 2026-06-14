@@ -77,7 +77,8 @@ const getMaterial = async (req, res) => {
 
 // GET /api/materials/:id/download
 // Generates a signed Cloudinary URL (works even if raw delivery requires auth)
-// and redirects the browser to it so the file downloads with its original name.
+// and redirects the browser to it. Pass ?inline=1 to view in-browser (e.g. PDF
+// preview); otherwise the file is sent as a download attachment.
 const downloadMaterial = async (req, res) => {
   try {
     const material = await Material.findById(req.params.id).lean();
@@ -85,13 +86,15 @@ const downloadMaterial = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Material not found.' });
     }
 
+    const inline = req.query.inline === '1' || req.query.inline === 'true';
+
     const signedUrl = cloudinary.utils.private_download_url(
       material.publicId,
       material.extension,
       {
         resource_type: 'raw',
         type: 'upload',
-        attachment: true,
+        attachment: !inline,
       }
     );
 

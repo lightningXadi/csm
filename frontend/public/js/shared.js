@@ -5,7 +5,7 @@
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
-const API_BASE = 'https://csm-j182.onrender.com/api';// Change to your deployed backend URL
+const API_BASE = 'https://csm-j182.onrender.com/api';
 
 const SUBJECTS = [
   { id: 'java',    name: 'Java Programming',           tag: 'JAVA',    semester: 5 },
@@ -122,7 +122,8 @@ function buildNav(activePage) {
   const fac = authGetFaculty();
   const userHtml = fac
     ? `<span class="nav-user">Signed in as <strong>${fac.name}</strong></span>
-       <button class="btn btn-ghost btn-sm" id="nav-logout">Log Out</button>`
+       <button class="btn btn-ghost btn-sm" id="nav-logout">Log Out</button>
+       <a href="faculty.html" class="nav-faculty ${activePage === 'faculty' ? 'active' : ''}">Dashboard ▸</a>`
     : `<a href="faculty.html" class="nav-faculty ${activePage === 'faculty' ? 'active' : ''}">Faculty ▸</a>`;
 
   nav.innerHTML = `
@@ -135,15 +136,15 @@ function buildNav(activePage) {
         <nav class="nav-links" id="nav-links">
           <a href="index.html"    class="${activePage === 'home'     ? 'active' : ''}">Home</a>
           <a href="browse.html"   class="${activePage === 'browse'   ? 'active' : ''}">Browse</a>
-          <a href="faculty.html"  class="${activePage === 'faculty'  ? 'active' : ''}">${fac ? 'Dashboard' : 'Faculty'}</a>
           ${userHtml}
         </nav>
       </div>
     </div>`;
 
   // Mobile toggle
-  document.getElementById('nav-toggle').addEventListener('click', () => {
+  document.getElementById('nav-toggle').addEventListener('click', (e) => {
     document.getElementById('nav-links').classList.toggle('open');
+    e.currentTarget.classList.toggle('open');
   });
 
   // Logout
